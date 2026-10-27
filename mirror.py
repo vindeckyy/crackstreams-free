@@ -299,12 +299,32 @@ def site(*parts):
 
 
 def main():
+    global OUT
     base = os.environ.get("BASE", "/")
     if base != "/" and not base.endswith("/"):
         base += "/"
 
+    # Build into a staging dir so a failed run never guts the previous site.
+    root_out = OUT
+    OUT = root_out + ".staging"
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
+    try:
+        rc = _build(base)
+    except BaseException:
+        shutil.rmtree(OUT, ignore_errors=True)
+        raise
+    if rc != 0:
+        shutil.rmtree(OUT, ignore_errors=True)
+        return rc
+    if os.path.isdir(root_out):
+        shutil.rmtree(root_out)
+    os.rename(OUT, root_out)
+    OUT = root_out
+    return 0
+
+
+def _build(base):
     os.makedirs(site("league"))
     os.makedirs(site("stream"))
     with open(site(".nojekyll"), "w") as f:
