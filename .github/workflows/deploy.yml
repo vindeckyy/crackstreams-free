@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   schedule:
     # 09:05 and 17:05 UTC daily — refresh schedules/stream links (best-effort;
-    # upstream 403-blocks Actions runners, so failure keeps the previous site)
+    # upstream 403-blocks Actions runners, so failure keeps the committed site)
     - cron: "5 9,17 * * *"
 
 permissions:
@@ -42,13 +42,11 @@ jobs:
             echo "ok=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Upload Pages artifact
-        if: steps.refresh.outputs.ok == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
   deploy:
-    if: needs.build.outputs.ok == 'true'
     needs: build
     runs-on: ubuntu-latest
     environment:
