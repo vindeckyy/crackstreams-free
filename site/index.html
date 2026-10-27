@@ -342,20 +342,7 @@ function toggleMenu() {
   menu.classList.toggle('show');
 }
 </script>
-<script>
-  document.getElementById('bookmarkBtn').addEventListener('click', function() {
-    const title = document.title;
-    const url = window.location.href;
 
-    if (window.sidebar && window.sidebar.addPanel) {
-      window.sidebar.addPanel(title, url, '');
-    } else if (window.external && ('AddFavorite' in window.external)) {
-      window.external.AddFavorite(url, title);
-    } else {
-      alert("Press Ctrl+D (Windows) or Cmd+D (Mac) to bookmark this page.");
-    }
-  });
-</script>
 
 </body>
 </html>

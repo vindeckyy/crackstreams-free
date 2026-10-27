@@ -8,12 +8,14 @@ serves at build time (schedules + stream links go stale daily).
 Env: BASE (default "/") — URL base when the site is not at a domain root.
 """
 import hashlib
+import json
 import os
 import re
 import shutil
 import subprocess
 import sys
 import time
+from urllib.parse import urlparse
 
 ORIGIN = "https://crackstreams.mx"
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -46,6 +48,7 @@ DROP_SCRIPTS = [
     re.compile(r"challenge-platform"),
     re.compile(r"window\.__CF\$cv\$params"),
     re.compile(r"window\['\w+'\]\s*="),   # obfuscated inline player script
+    re.compile(r"getElementById\('bookmarkBtn'\)"),  # element doesn't exist upstream either
 ]
 ADMaven_RE = re.compile(r"<meta name='admaven-placement'[^>]*>", re.I)
 TITLE_RE = re.compile(r"<title>(.*?)</title>", re.S)
@@ -279,6 +282,28 @@ def build_league(slug, base, footer):
     return slugs
 
 
+# Embed hosts that allow framing from any origin (checked against their
+# X-Frame-Options / CSP frame-ancestors). Hosts that gate framing to
+# crackstreams.mx move to the back of the link list so Link-1 always plays.
+FRAMEABLE_HOSTS = {"gblog.asia", "taifood-blog.asia", "gszone.top"}
+
+
+def reorder_streams(html):
+    """Sort allStreams entries: frameable hosts first, stable within group."""
+    m = re.search(r"const allStreams = (\[.*?\]);", html, re.S)
+    if not m:
+        return html
+    try:
+        streams = json.loads(m.group(1))
+    except ValueError:
+        return html
+    if not all(isinstance(s, dict) and "value" in s for s in streams):
+        return html
+    streams.sort(key=lambda s: 0 if urlparse(s["value"]).hostname in FRAMEABLE_HOSTS else 1)
+    payload = json.dumps(streams, separators=(",", ":"))
+    return html[:m.start()] + "const allStreams = " + payload + ";" + html[m.end():]
+
+
 def build_stream(slug, base):
     html = fetch("/stream/%s" % slug, retries=1)
     if html is None:
@@ -287,6 +312,7 @@ def build_stream(slug, base):
         log("MISSING stream  %s (fetch failed, 404, or no links yet)" % slug)
         return None
     html = localize_images(rewrite_links(clean(html), base), base)
+    html = reorder_streams(html)
     html = html.replace("&copy; 2025", "&copy; 2026")
     with open(site("stream", slug + ".html"), "w", encoding="utf-8") as f:
         f.write(html)
