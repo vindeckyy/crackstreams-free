@@ -1,0 +1,183 @@
+/* Global Styling */
+body {
+  margin: 0;
+  background-color: #2e2f33;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+}
+
+header {
+  background: #0a0a0a;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+header a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+header a:hover {
+  background: #fff;
+  color: #000;
+}
+
+.container {
+  display: flex;
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 20px;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.main {
+  flex: 3;
+}
+
+.sidebar {
+  flex: 1;
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  padding: 10px 0;
+  border-top: 1px solid #555;
+  border-bottom: 1px solid #555;
+}
+
+h2 {
+  font-size: 1.4rem;
+  margin: 30px 0 10px;
+  border-bottom: 1px solid #aaa;
+  padding-bottom: 5px;
+  color: #4ecdc4;
+  position: relative;
+  padding-left: 28px;
+}
+
+h2::before {
+  content: '';
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #4ecdc4;
+  font-size: 1.1rem;
+}
+
+.card {
+  background-color: #1e4e5f;
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  color: white;
+  transition: background 0.3s ease;
+}
+
+.card-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.card img {
+  height: 50px;
+  border-radius: 5px;
+  background: transparent;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.card-subtitle {
+  font-size: 0.9rem;
+  color: #ddd;
+}
+
+.card:hover {
+  background-color: #2a6b7e;
+  transform: scale(1.01);
+}
+
+.btn {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #ddd;
+}
+
+.sidebar h3 {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.sidebar p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #ccc;
+}
+
+/* Smooth fade-in animation */
+.card, .sidebar, h2 {
+  animation: fadeInIndex 0.6s ease-in-out;
+}
+
+@keyframes fadeInIndex {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.btn-bookmark {
+  background: linear-gradient(to right, #ff416c, #ff4b2b);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: background 0.3s ease;
+}
+.btn-bookmark:hover {
+  background: linear-gradient(to right, #ff4b2b, #ff416c);
+}

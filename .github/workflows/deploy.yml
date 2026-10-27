@@ -5,7 +5,8 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    # 09:05 and 17:05 UTC daily — refresh schedules/stream links
+    # 09:05 and 17:05 UTC daily — refresh schedules/stream links (best-effort;
+    # upstream 403-blocks Actions runners, so failure keeps the previous site)
     - cron: "5 9,17 * * *"
 
 permissions:
@@ -20,27 +21,34 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.refresh.outputs.ok }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Build site
+      - name: Refresh site from upstream (best-effort)
+        id: refresh
         run: |
-          # user-site repos (<owner>.github.io) serve at "/", project repos
-          # at "/<repo>/"
           if [ "${{ github.event.repository.name }}" = "${{ github.repository_owner }}.github.io" ]; then
             export BASE="/"
           else
             export BASE="/${{ github.event.repository.name }}/"
           fi
-          python3 mirror.py
+          if timeout 900 python3 mirror.py; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Upload Pages artifact
+        if: steps.refresh.outputs.ok == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
   deploy:
+    if: needs.build.outputs.ok == 'true'
     needs: build
     runs-on: ubuntu-latest
     environment:

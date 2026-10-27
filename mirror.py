@@ -18,7 +18,7 @@ import time
 ORIGIN = "https://crackstreams.mx"
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
       "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36")
-OUT = "site"
+OUT = os.environ.get("OUT_DIR", "site")
 
 LEAGUE_PAGES = [
     "nflstreams", "nbaregular66", "mlbwildcard", "nhlstreams",
